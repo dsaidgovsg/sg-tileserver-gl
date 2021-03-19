@@ -1,0 +1,6 @@
+app/fonts/*
+!app/fonts/.gitkeep
+app/sprites/*
+!app/sprites/.gitkeep
+npm-cache/
+node_modules/

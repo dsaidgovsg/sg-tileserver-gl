@@ -1,0 +1,28 @@
+FROM debian:buster-slim
+
+SHELL ["/bin/bash", "-c"]
+
+RUN set -euo pipefail && \
+    apt-get update; \
+    apt-get install --no-install-recommends -y \
+        ca-certificates \
+        curl \
+        build-essential \
+        libmapnik-dev \
+        python2.7 \
+        ; \
+    curl -fsSL https://deb.nodesource.com/setup_14.x | bash -; \
+    apt-get install --no-install-recommends -y \
+        nodejs \
+        # mapnik requires this
+        ; \
+    rm -rf /var/lib/apt/lists/*; \
+    :
+
+WORKDIR /project
+COPY ./package.json ./package-lock.json ./
+
+RUN set -euo pipefail && \
+    npm --cache /tmp/npm-cache ci; \
+    npm cache clean --force; \
+    :

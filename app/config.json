@@ -1,0 +1,39 @@
+{
+    "options": {
+        "paths": {
+            "root": "/app",
+            "fonts": "fonts",
+            "sprites": "sprites",
+            "styles": "styles",
+            "mbtiles": "tiles"
+        }
+    },
+    "styles": {
+        "basic": {
+            "style": "basic_without_boundary.json"
+        },
+        "bright": {
+            "style": "bright_without_boundary.json"
+        },
+        "dark_matter": {
+            "style": "dark_matter_without_boundary.json"
+        },
+        "fiord_color": {
+            "style": "fiord_color_without_boundary.json"
+        },
+        "osm_liberty": {
+            "style": "osm_liberty_without_boundary.json"
+        },
+        "positron": {
+            "style": "positron_without_boundary.json"
+        },
+        "toner": {
+            "style": "toner_without_boundary.json"
+        }
+    },
+    "data": {
+        "singapore": {
+            "mbtiles": "2017-07-03_asia_malaysia-singapore-brunei.mbtiles"
+        }
+    }
+}
