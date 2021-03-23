@@ -22,3 +22,6 @@
 [submodule "vendor/openmaptiles-fonts"]
 	path = vendor/openmaptiles-fonts
 	url = https://github.com/openmaptiles/fonts.git
+[submodule "vendor/openmaptiles"]
+	path = vendor/openmaptiles
+	url = https://github.com/openmaptiles/openmaptiles.git

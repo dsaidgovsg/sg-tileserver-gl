@@ -2,5 +2,11 @@ app/fonts/*
 !app/fonts/.gitkeep
 app/sprites/*
 !app/sprites/.gitkeep
+app/styles/*
+!app/styles/.gitkeep
+app/tiles/*
+!app/tiles/.gitkeep
+build/*
+!build/.gitkeep
 npm-cache/
 node_modules/

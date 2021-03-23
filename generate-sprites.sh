@@ -5,13 +5,13 @@ VENDOR_DIR="vendor"
 SPRITES_DIR="app/sprites"
 
 declare -A STYLES=(
-    ["dark-matter"]="dark-matter-gl-style/icons"
-    ["fiord-color"]="fiord-color-gl-style/icons"
     ["basic"]="maptiler-basic-gl-style/icons"
-    ["toner"]="maptiler-toner-gl-style/icons"
-    ["osm-bright"]="osm-bright-gl-style/icons"
-    ["osm-liberty"]="osm-liberty/svgs/svgs_iconset"
+    ["bright"]="osm-bright-gl-style/icons"
+    ["dark_matter"]="dark-matter-gl-style/icons"
+    ["fiord_color"]="fiord-color-gl-style/icons"
+    ["osm_liberty"]="osm-liberty/svgs/svgs_iconset"
     ["positron"]="positron-gl-style/icons"
+    ["toner"]="maptiler-toner-gl-style/icons"
 )
 
 for STYLE in "${!STYLES[@]}"; do

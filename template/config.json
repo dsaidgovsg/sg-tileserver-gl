@@ -33,7 +33,7 @@
     },
     "data": {
         "singapore": {
-            "mbtiles": "singapore_2021-03-22T21:21:57Z.mbtiles"
+            "mbtiles": "singapore_{{ TAG }}.mbtiles"
         }
     }
 }
