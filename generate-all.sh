@@ -7,4 +7,7 @@ echo "Generating fonts..."
 echo "Generating sprites..."
 ./generate-sprites.sh
 
+echo "Generating styles..."
+./generate-styles.sh
+
 echo "Completed!"

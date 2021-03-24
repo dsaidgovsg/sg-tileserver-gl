@@ -5,9 +5,10 @@ SHELL ["/bin/bash", "-c"]
 RUN set -euo pipefail && \
     apt-get update; \
     apt-get install --no-install-recommends -y \
+        build-essential \
         ca-certificates \
         curl \
-        build-essential \
+        jq \
         libmapnik-dev \
         python2.7 \
         ; \
@@ -24,5 +25,5 @@ COPY ./package.json ./package-lock.json ./
 
 RUN set -euo pipefail && \
     npm --cache /tmp/npm-cache ci; \
-    npm cache clean --force; \
+    rm -rf /tmp/npm-cache; \
     :

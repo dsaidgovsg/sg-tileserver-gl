@@ -7,7 +7,12 @@ fi
 
 # Scrape for the last updated date metadata
 # Change if broken
-TAG=$(curl https://download.geofabrik.de/asia/malaysia-singapore-brunei.html | grep malaysia-singapore-brunei-latest.osm.pbf | grep -oP '\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z')
+TAG=$(curl https://download.geofabrik.de/asia/malaysia-singapore-brunei.html \
+    | grep malaysia-singapore-brunei-latest.osm.pbf \
+    | grep -oP '\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z')
+
+# Copy required config
+awk -v TAG="${TAG}" '{ sub(/\{\{ TAG }}/, TAG); print $0 }' template/config.json > app/config.json
 
 # Need to be in the context of the directory
 VENDOR_DIR=vendor/openmaptiles
@@ -19,7 +24,9 @@ mkdir -p "${DATA_DIR}"
 # This is to match the expected file path to prevent a download
 # https://github.com/openmaptiles/openmaptiles/blob/f591f2e28efd377f529cfbae3a89e55c0d0bff2c/quickstart.sh#L138
 if [[ ! -f "${DATA_DIR}/singapore.osm.pbf" ]]; then
-    curl -fL https://download.geofabrik.de/asia/malaysia-singapore-brunei-latest.osm.pbf -o "${DATA_DIR}/singapore.osm.pbf"
+    curl -fL \
+        -o "${DATA_DIR}/singapore.osm.pbf" \
+        https://download.geofabrik.de/asia/malaysia-singapore-brunei-latest.osm.pbf
 fi
 
 # Modification of generation env vars for our purpose
