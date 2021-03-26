@@ -1,11 +1,11 @@
 {
     "options": {
         "paths": {
-            "root": "/app",
+            "root": "/data",
             "fonts": "fonts",
             "sprites": "sprites",
             "styles": "styles",
-            "mbtiles": "tiles"
+            "mbtiles": "mbtiles"
         }
     },
     "styles": {

@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VENDOR_DIR="vendor"
-STYLES_DIR="app/styles"
-ORIGINAL_FORMATTED_DIR="build/styles/original_formatted"
-BOUNDARIES_REMOVED_DIR="build/styles/boundaries_removed"
+# Get this script dir
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ROOT_DIR="${DIR}/.."
+
+VENDOR_DIR="${ROOT_DIR}/vendor"
+STYLES_DIR="${ROOT_DIR}/data/styles"
+ORIGINAL_FORMATTED_DIR="${ROOT_DIR}/build/styles/original_formatted"
+BOUNDARIES_REMOVED_DIR="${ROOT_DIR}/build/styles/boundaries_removed"
 
 mkdir -p "${ORIGINAL_FORMATTED_DIR}"
 mkdir -p "${BOUNDARIES_REMOVED_DIR}"

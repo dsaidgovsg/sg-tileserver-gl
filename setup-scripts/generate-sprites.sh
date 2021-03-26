@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VENDOR_DIR="vendor"
-SPRITES_DIR="app/sprites"
+# Get this script dir
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ROOT_DIR="${DIR}/.."
+
+VENDOR_DIR="${ROOT_DIR}/vendor"
+SPRITES_DIR="${ROOT_DIR}/data/sprites"
+NODE_MODULES_BIN_DIR="${ROOT_DIR}/node_modules/.bin"
 
 declare -A STYLES=(
     ["basic"]="maptiler-basic-gl-style/icons"
@@ -16,6 +21,6 @@ declare -A STYLES=(
 
 for STYLE in "${!STYLES[@]}"; do
     echo "> Generating sprites for ${STYLE}..."
-    ./node_modules/.bin/spritezero "${SPRITES_DIR}/${STYLE}" "${VENDOR_DIR}/${STYLES[$STYLE]}"
-    ./node_modules/.bin/spritezero --retina "${SPRITES_DIR}/${STYLE}@2x" "${VENDOR_DIR}/${STYLES[$STYLE]}"
+    "${NODE_MODULES_BIN_DIR}/spritezero" "${SPRITES_DIR}/${STYLE}" "${VENDOR_DIR}/${STYLES[$STYLE]}"
+    "${NODE_MODULES_BIN_DIR}/spritezero" --retina "${SPRITES_DIR}/${STYLE}@2x" "${VENDOR_DIR}/${STYLES[$STYLE]}"
 done
