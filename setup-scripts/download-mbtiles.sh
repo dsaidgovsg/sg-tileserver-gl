@@ -23,6 +23,10 @@ if [[ -z "${MBTILES_TAG}" ]]; then
     exit 1
 fi
 
+# Clean up previous files
+find "${DATA_MBTILES_DIR}" -type f -not -name '.gitkeep' -not -name "singapore_${MBTILES_TAG}.mbtiles" -exec rm {} \;
+rm -f "${DATA_DIR}/config.json"
+
 # Download the externally uploaded mbtiles
 if [[ -f "${DATA_MBTILES_DIR}/singapore_${MBTILES_TAG}.mbtiles" ]]; then
     echo "singapore_${MBTILES_TAG}.mbtiles exists, skipping download"

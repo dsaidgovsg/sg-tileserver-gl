@@ -19,6 +19,9 @@ if ! command -v node >/dev/null; then
     exit 1
 fi
 
+# Clean up previous files
+find "${DATA_FONTS_DIR}" -type f -not -name '.gitkeep' -exec rm {} \;
+
 pushd "${VENDOR_FONTS_DIR}"
 npm --cache "${NPM_CACHE_DIR}" install
 rm -rf "${NPM_CACHE_DIR}"

@@ -19,6 +19,9 @@ declare -A STYLES=(
     ["toner"]="maptiler-toner-gl-style/icons"
 )
 
+# Clean up previous files
+find "${SPRITES_DIR}" -type f -not -name '.gitkeep' -exec rm {} \;
+
 for STYLE in "${!STYLES[@]}"; do
     echo "> Generating sprites for ${STYLE}..."
     "${NODE_MODULES_BIN_DIR}/spritezero" "${SPRITES_DIR}/${STYLE}" "${VENDOR_DIR}/${STYLES[$STYLE]}"

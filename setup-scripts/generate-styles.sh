@@ -25,6 +25,9 @@ declare -A STYLES=(
     ["toner"]="maptiler-toner-gl-style/style.json|boundary_country_z5-"
 )
 
+# Clean up previous files
+find "${STYLES_DIR}" -type f -not -name '.gitkeep' -exec rm {} \;
+
 for STYLE in "${!STYLES[@]}"; do
     echo "> Removing boundary for ${STYLE}..."
     filepath="$(echo ${STYLES[$STYLE]} | cut -d '|' -f 1)"
