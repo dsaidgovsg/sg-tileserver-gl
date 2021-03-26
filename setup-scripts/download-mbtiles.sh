@@ -34,7 +34,7 @@ elif [[ "${MBTILES_SKIP_DOWNLOAD}" == "true" ]]; then
     echo "MBTILES_SKIP_DOWNLOAD is set to true, skipping download"
 else
     curl -fLO "https://github.com/dsaidgovsg/sg-tileserver-gl/releases/download/mbtiles/singapore_${MBTILES_TAG}.mbtiles"
-    cp "singapore_${MBTILES_TAG}.mbtiles" "${DATA_MBTILES_DIR}/"
+    mv "singapore_${MBTILES_TAG}.mbtiles" "${DATA_MBTILES_DIR}/"
 fi
 
 # Copy required config

@@ -15,15 +15,8 @@ RUN set -euo pipefail && \
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash -; \
     apt-get install --no-install-recommends -y \
         nodejs \
-        # mapnik requires this
         ; \
     rm -rf /var/lib/apt/lists/*; \
     :
 
-WORKDIR /project
-COPY ./package.json ./package-lock.json ./
-
-RUN set -euo pipefail && \
-    npm --cache /tmp/npm-cache ci; \
-    rm -rf /tmp/npm-cache; \
-    :
+WORKDIR /app

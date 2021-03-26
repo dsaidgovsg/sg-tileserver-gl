@@ -4,6 +4,7 @@ set -euo pipefail
 # Get this script dir
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ROOT_DIR="${DIR}/.."
+NPM_CACHE_DIR=/tmp/npm-cache
 
 VENDOR_DIR="${ROOT_DIR}/vendor"
 SPRITES_DIR="${ROOT_DIR}/data/sprites"
@@ -18,6 +19,10 @@ declare -A STYLES=(
     ["positron"]="positron-gl-style/icons"
     ["toner"]="maptiler-toner-gl-style/icons"
 )
+
+# Install prerequisites
+npm --cache "${NPM_CACHE_DIR}" ci
+rm -rf "${NPM_CACHE_DIR}"
 
 # Clean up previous files
 find "${SPRITES_DIR}" -type f -not -name '.gitkeep' -exec rm {} \;
