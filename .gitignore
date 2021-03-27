@@ -10,3 +10,4 @@ build/*
 !build/.gitkeep
 npm-cache/
 node_modules/
+data/config.json

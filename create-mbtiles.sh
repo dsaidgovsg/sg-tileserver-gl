@@ -51,6 +51,11 @@ ln -s "singapore_${DATETIME}.osm.pbf" "${VENDOR_REL_DATA_DIR}/singapore.osm.pbf"
 # Fixed value
 BBOX="103.062,0.807,104.545,1.823"
 
+if [[ -f ".env.bak" ]]; then
+    echo "Found previous environment backup, restoring..."
+    cp .env.bak .env
+fi
+
 awk -v BBOX="${BBOX}" -v MIN_ZOOM="${MIN_ZOOM}" -v MAX_ZOOM="${MAX_ZOOM}" '{
     sub(/BBOX=.*/, "BBOX=" BBOX);
     sub(/MIN_ZOOM=.*/, "MIN_ZOOM=" MIN_ZOOM);
