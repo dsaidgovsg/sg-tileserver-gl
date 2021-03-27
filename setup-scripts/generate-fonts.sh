@@ -29,4 +29,4 @@ rm package-lock.json
 node ./generate.js
 popd
 
-cp -r ${VENDOR_FONTS_DIR}/_output/* "${DATA_FONTS_DIR}/"
+cp -r "${VENDOR_FONTS_DIR}/_output/"* "${DATA_FONTS_DIR}/"
