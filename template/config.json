@@ -6,7 +6,8 @@
             "sprites": "sprites",
             "styles": "styles",
             "mbtiles": "mbtiles"
-        }
+        },
+        "serveAllFonts": true
     },
     "styles": {
         "basic": {

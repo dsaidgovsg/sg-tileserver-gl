@@ -56,6 +56,6 @@ for STYLE in "${!STYLES[@]}"; do
     jq -r ".
         | .sources.openmaptiles.url=\"mbtiles://{singapore}\"
         | if .sprite? then .sprite=\"${STYLE}\" else . end
-        | if .glyphs? then .glyphs=\"{fontstack}/{range}.pbf?key={key}\" else . end
+        | if .glyphs? then .glyphs=\"{fontstack}/{range}.pbf\" else . end
         " <"${BOUNDARIES_REMOVED_DIR}/${STYLE}.json" >"${STYLES_DIR}/${STYLE}.json"
 done
