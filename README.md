@@ -144,6 +144,12 @@ TILESERVER_GL_VERSION=v3.1.1
 docker run --rm -it -p 8080:80 "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
 ```
 
+To play around with the maps service, open your web browser and go to
+<http://localhost:8080/>
+
+To see all the styles that are available to use, go to
+<http://localhost:8080/styles.json>
+
 ### Build details (for reading)
 
 *Feel free to skip this section if you are not interested in the details.*
