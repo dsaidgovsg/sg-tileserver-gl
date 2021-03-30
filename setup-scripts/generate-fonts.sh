@@ -25,7 +25,7 @@ find "${DATA_FONTS_DIR}" -type f -not -name '.gitkeep' -exec rm {} \;
 pushd "${VENDOR_FONTS_DIR}"
 npm --cache "${NPM_CACHE_DIR}" install
 rm -rf "${NPM_CACHE_DIR}"
-rm package-lock.json
+rm -f package-lock.json
 node ./generate.js
 popd
 
