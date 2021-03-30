@@ -1,0 +1,43 @@
+{
+    "options": {
+        "paths": {
+            "root": "/data",
+            "fonts": "fonts",
+            "sprites": "sprites",
+            "styles": "styles",
+            "mbtiles": "mbtiles"
+        },
+        "serveAllFonts": true
+    },
+    "styles": {
+        "basic": {
+            "style": "basic.json"
+        },
+        "bright": {
+            "style": "bright.json"
+        },
+        "dark_matter": {
+            "style": "dark_matter.json"
+        },
+        "fiord_color": {
+            "style": "fiord_color.json"
+        },
+        "osm_liberty": {
+            "style": "osm_liberty.json"
+        },
+        "positron": {
+            "style": "positron.json"
+        },
+        "several_gray": {
+            "style": "several_gray.json"
+        },
+        "toner": {
+            "style": "toner.json"
+        }
+    },
+    "data": {
+        "singapore": {
+            "mbtiles": "singapore_{{ TAG }}.mbtiles"
+        }
+    }
+}

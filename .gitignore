@@ -1,0 +1,13 @@
+data/fonts/*
+!data/fonts/.gitkeep
+data/sprites/*
+!data/sprites/.gitkeep
+data/styles/*
+!data/styles/.gitkeep
+data/mbtiles/*
+!data/mbtiles/.gitkeep
+build/*
+!build/.gitkeep
+npm-cache/
+node_modules/
+data/config.json
