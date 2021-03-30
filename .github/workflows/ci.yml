@@ -47,7 +47,7 @@ jobs:
     - name: Check differences between ci.yml and ci.yml.tmpl
       run: |-
         cp .github/workflows/ci.yml .github/workflows/ci.yml.backup
-        TERA=/tmp/tera ./templates/apply-vars.sh
+        TERA=/tmp/tera .github-templates/apply-vars.sh
         if ! diff .github/workflows/ci.yml .github/workflows/ci.yml.backup; then echo "ci.yml.tmpl and ci.yml differs!" && exit 1; fi
     - name: Run setup-scripts
       run: |-
