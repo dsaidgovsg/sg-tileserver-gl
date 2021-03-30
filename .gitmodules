@@ -21,7 +21,10 @@
 	url = https://github.com/maputnik/osm-liberty.git
 [submodule "vendor/openmaptiles-fonts"]
 	path = vendor/openmaptiles-fonts
-	url = https://github.com/openmaptiles/fonts.git
+	url = https://github.com/dsaidgovsg/fonts.git
 [submodule "vendor/openmaptiles"]
 	path = vendor/openmaptiles
 	url = https://github.com/openmaptiles/openmaptiles.git
+[submodule "vendor/several-shades-of-gray-gl-style"]
+	path = vendor/several-shades-of-gray-gl-style
+	url = https://github.com/dsaidgovsg/several-shades-of-gray-gl-style.git

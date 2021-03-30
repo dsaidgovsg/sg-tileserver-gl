@@ -22,6 +22,7 @@ declare -A STYLES=(
     ["fiord_color"]="fiord-color-gl-style/style.json|boundary_country_z5-"
     ["osm_liberty"]="osm-liberty/style.json|boundary_2_z5-"
     ["positron"]="positron-gl-style/style.json|boundary_country_z5-"
+    ["several_gray"]="several-shades-of-gray-gl-style/style.json|boundary_country"
     ["toner"]="maptiler-toner-gl-style/style.json|boundary_country_z5-"
 )
 

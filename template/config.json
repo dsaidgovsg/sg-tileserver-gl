@@ -28,6 +28,9 @@
         "positron": {
             "style": "positron.json"
         },
+        "several_gray": {
+            "style": "several_gray.json"
+        },
         "toner": {
             "style": "toner.json"
         }

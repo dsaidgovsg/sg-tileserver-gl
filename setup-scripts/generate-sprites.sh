@@ -17,6 +17,7 @@ declare -A STYLES=(
     ["fiord_color"]="fiord-color-gl-style/icons"
     ["osm_liberty"]="osm-liberty/svgs/svgs_iconset"
     ["positron"]="positron-gl-style/icons"
+    ["several_gray"]="several-shades-of-gray-gl-style/icons"
     ["toner"]="maptiler-toner-gl-style/icons"
 )
 
