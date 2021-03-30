@@ -19,7 +19,7 @@ if ! command -v curl >/dev/null; then
 fi
 
 if [[ -z "${MBTILES_TAG}" ]]; then
-    >&2 echo "Please specify 'MBTILES_TAG' to target the mbtiles file to download (e.g. 0-14_20210323T212153Z)"
+    >&2 echo "Please specify 'MBTILES_TAG' to target the mbtiles file to download (e.g. 0-18_20210325T212157Z)"
     exit 1
 fi
 
