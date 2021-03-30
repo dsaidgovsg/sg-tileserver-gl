@@ -200,6 +200,17 @@ to easily identify the original input paramters used to build the MBTiles.
 
 The uploading steps is already described in the [earlier section](#MBTiles-creation).
 
+## How to Apply Template for CI build
+
+For Linux user, you can download Tera CLI v0.4 at <https://github.com/guangie88/tera-cli/releases>
+and place it in `PATH`.
+
+Otherwise, you will need `cargo`, which can be installed via [rustup](https://rustup.rs/).
+
+Once `cargo` is installed, simply run `cargo install tera-cli --version=^0.4.0`.
+
+After which, run `.github-templates/apply-vars.sh` to generate `.github/workflows/ci.yml`.
+
 ## Acknowledgement
 
 ### Previous repositories set-up

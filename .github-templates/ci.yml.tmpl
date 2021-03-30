@@ -15,14 +15,22 @@ jobs:
     strategy:
       matrix:
         version:
-        - tileserver: "v3.1.1"
-          mbtiles:    "0-18_20210325T212157Z"
+{%- for v in versions %}
+{%- for tileserver in v.tileserver %}
+{%- for mbtiles in v.mbtiles %}
+        - tileserver: "{{ tileserver }}"
+          mbtiles:    "{{ mbtiles }}"
+{%- endfor %}
+{%- endfor %}
+{%- endfor %}
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: sg-tileserver-gl
-      SELF_VERSION: "v1.0.0"
+      SELF_VERSION: "{{ self_version }}"
+      {% raw -%}
       TILESERVER_VERSION: "${{ matrix.version.tileserver }}"
       MBTILES_TAG: "${{ matrix.version.mbtiles }}"
+      {%- endraw %}
     steps:
     - name: Set TAG_NAME as env var export
       run: |-
@@ -59,7 +67,9 @@ jobs:
     - name: Push Docker image
       run: bash push-images.sh
       env:
+        {% raw -%}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         IMAGE_ORG: ${{ secrets.IMAGE_ORG }}
+        {%- endraw %}
       if: github.event_name == 'push'
