@@ -40,8 +40,8 @@ jobs:
         echo "XY_TAG_NAME=${XY_TAG_NAME}" >> $GITHUB_ENV
     - name: Checkout code
       uses: actions/checkout@v2
-        with:
-          submodules: true
+      with:
+        submodules: true
     - name: Install tera-cli
       run: |-
         wget https://github.com/guangie88/tera-cli/releases/download/v0.4.0/tera_linux_amd64 -O /tmp/tera
