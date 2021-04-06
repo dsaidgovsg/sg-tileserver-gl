@@ -17,12 +17,12 @@ mkdir -p "${BOUNDARIES_REMOVED_DIR}"
 # Open the style.json in the editor, and select the boundary around Singapore to check the layer id
 declare -A STYLES=(
     ["basic"]="maptiler-basic-gl-style/style.json|admin_sub,admin_country_z5-"
-    ["bright"]="osm-bright-gl-style/style.json|boundary-water,ferry"
+    ["bright"]="osm-bright-gl-style/style.json|boundary-water,boundary-land-level-4,ferry"
     ["dark_matter"]="dark-matter-gl-style/style.json|boundary_country_z5-"
     ["fiord_color"]="fiord-color-gl-style/style.json|boundary_country_z5-"
     ["osm_liberty"]="osm-liberty/style.json|boundary_2_z5-"
     ["positron"]="positron-gl-style/style.json|boundary_country_z5-"
-    ["several_gray"]="several-shades-of-gray-gl-style/style.json|boundary_country"
+    ["several_gray"]="several-shades-of-gray-gl-style/style.json|boundary_country,waterway"
     ["toner"]="maptiler-toner-gl-style/style.json|boundary_country_z5-"
 )
 
