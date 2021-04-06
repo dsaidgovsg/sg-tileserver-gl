@@ -1,4 +1,4 @@
-self_version: "v1.0.0"
+self_version: "v1.1.0"
 
 versions:
 - tileserver: ["v3.1.1"]

@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: sg-tileserver-gl
-      SELF_VERSION: "v1.0.0"
+      SELF_VERSION: "v1.1.0"
       TILESERVER_VERSION: "${{ matrix.version.tileserver }}"
       MBTILES_TAG: "${{ matrix.version.mbtiles }}"
     steps:
