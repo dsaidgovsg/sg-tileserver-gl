@@ -30,16 +30,14 @@ jobs:
       run: |-
         SUFFIX_TAG="tileserver-${TILESERVER_VERSION}_mbtiles-${MBTILES_TAG}"
 
-        TAG_NAME="${SELF_VERSION}_${SUFFIX_TAG}"
-        echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+        echo "TAG_NAME=${SELF_VERSION}_${SUFFIX_TAG}" >> $GITHUB_ENV
+        echo "OPENRESTY_SUFFIX=_openresty" >> $GITHUB_ENV
 
         SELF_X_VERSION="$(echo ${SELF_VERSION} | cut -d . -f 1)"
-        X_TAG_NAME="${SELF_X_VERSION}_${SUFFIX_TAG}"
-        echo "X_TAG_NAME=${X_TAG_NAME}" >> $GITHUB_ENV
+        echo "X_TAG_NAME=${SELF_X_VERSION}_${SUFFIX_TAG}" >> $GITHUB_ENV
 
         SELF_XY_VERSION="$(echo ${SELF_VERSION} | cut -d . -f 1,2)"
-        XY_TAG_NAME="${SELF_XY_VERSION}_${SUFFIX_TAG}"
-        echo "XY_TAG_NAME=${XY_TAG_NAME}" >> $GITHUB_ENV
+        echo "XY_TAG_NAME=${SELF_XY_VERSION}_${SUFFIX_TAG}" >> $GITHUB_ENV
     - name: Checkout code
       uses: actions/checkout@v2
       with:
@@ -59,9 +57,14 @@ jobs:
     - name: Run setup-scripts
       run: |-
         MBTILES_TAG=${MBTILES_TAG} ./setup.sh
-    - name: Build Docker image
+    - name: Build Docker image (native)
       run: |-
         docker build . -t "${IMAGE_NAME}:${TAG_NAME}" \
+          --target native \
+          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}"
+    - name: Build Docker image (with openresty)
+      run: |-
+        docker build . -t "${IMAGE_NAME}:${TAG_NAME}${OPENRESTY_SUFFIX}" \
           --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}"
     - name: Push Docker image
       run: bash push-images.sh
