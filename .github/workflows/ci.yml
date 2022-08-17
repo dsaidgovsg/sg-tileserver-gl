@@ -17,6 +17,8 @@ jobs:
         version:
         - tileserver: "v3.1.1"
           mbtiles:    "0-18_20210325T212157Z"
+        - tileserver: "v3.1.1"
+          mbtiles:    "0-18_20220815T202133Z"
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: sg-tileserver-gl
@@ -60,7 +62,7 @@ jobs:
     - name: Build Docker image
       run: |-
         docker build . -t "${IMAGE_NAME}:${TAG_NAME}" \
-          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}" \
+          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}"
     - name: Push Docker image
       run: bash push-images.sh
       env:

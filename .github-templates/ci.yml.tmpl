@@ -68,7 +68,7 @@ jobs:
     - name: Build Docker image
       run: |-
         docker build . -t "${IMAGE_NAME}:${TAG_NAME}" \
-          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}" \
+          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}"
     - name: Push Docker image
       run: bash push-images.sh
       env:
