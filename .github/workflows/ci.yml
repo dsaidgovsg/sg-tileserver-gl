@@ -23,12 +23,12 @@ jobs:
     env:
       IMAGE_NAME: sg-tileserver-gl
       SELF_VERSION: "v1.1.0"
-      TILESERVER_VERSION: "${{ matrix.version.tileserver }}"
+      TILESERVER_GL_VERSION: "${{ matrix.version.tileserver }}"
       MBTILES_TAG: "${{ matrix.version.mbtiles }}"
     steps:
     - name: Set TAG_NAME as env var export
       run: |-
-        SUFFIX_TAG="tileserver-${TILESERVER_VERSION}_mbtiles-${MBTILES_TAG}"
+        SUFFIX_TAG="tileserver-${TILESERVER_GL_VERSION}_mbtiles-${MBTILES_TAG}"
 
         echo "TAG_NAME=${SELF_VERSION}_${SUFFIX_TAG}" >> $GITHUB_ENV
         echo "OPENRESTY_SUFFIX=_openresty" >> $GITHUB_ENV
@@ -61,11 +61,11 @@ jobs:
       run: |-
         docker build . -t "${IMAGE_NAME}:${TAG_NAME}" \
           --target native \
-          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}"
+          --build-arg TILESERVER_GL_VERSION="${TILESERVER_GL_VERSION}"
     - name: Build Docker image (with openresty)
       run: |-
         docker build . -t "${IMAGE_NAME}:${TAG_NAME}${OPENRESTY_SUFFIX}" \
-          --build-arg TILESERVER_VERSION="${TILESERVER_VERSION}"
+          --build-arg TILESERVER_GL_VERSION="${TILESERVER_GL_VERSION}"
     - name: Push Docker image
       run: bash push-images.sh
       env:
