@@ -73,7 +73,8 @@ This step has been greatly automated, and all that is required is to do either o
 
 ### Native build
 
-You will need to have `npm` installed, preferably the stable versions 12 or 14.
+You will need to have `npm` installed, and the `node` version must be **12** due to limitations of
+the vendored dependencies, specifically for [vendor/openmaptiles-fonts](vendor/openmaptiles-fonts).
 
 Simply run:
 
