@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 SHELL ["/bin/bash", "-c"]
 
@@ -12,7 +12,7 @@ RUN set -euo pipefail && \
         libmapnik-dev \
         python2.7 \
         ; \
-    curl -fsSL https://deb.nodesource.com/setup_14.x | bash -; \
+    curl -fsSL https://deb.nodesource.com/setup_12.x | bash -; \
     apt-get install --no-install-recommends -y \
         nodejs \
         ; \
