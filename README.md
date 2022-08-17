@@ -136,6 +136,7 @@ With the files in `data/`, run:
 TILESERVER_GL_VERSION=v3.1.1
 docker build . \
     --build-arg TILESERVER_GL_VERSION="${TILESERVER_GL_VERSION}" \
+    --target native \
     -t "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
 ```
 
@@ -151,6 +152,44 @@ To play around with the maps service, open your web browser and go to
 
 To see all the styles that are available to use, go to
 <http://localhost:8080/styles.json>
+
+#### Final Docker build alternative hosted via OpenResty
+
+This is the alternative image build (more flexible and robust) that installs `openresty` (and
+`supervisord`) to host the tileserver. This allows for NGINX configuration + Lua scripts to change
+some of the behaviors that the tileserver could not provide, e.g.
+
+- Specific CORS header set-up, instead of a allow-none / allow-all approach
+- Lua script to amend request / response body, etc.
+
+A basic default `nginx.conf` is placed into `/etc/openresty/nginx.conf`, and port 8080 is always
+used for the `openresty` webserver. If a more complex `nginx.conf` is preferred, simply override the
+file before running the container.
+
+Also, because there are now two services (tileserver and `openresty`) running, `supervisord` is also
+installed to properly manage the running of the two services. The default configuration for it is
+located in `/etc/supervisor/conf.d/supervisord.conf`, if one prefers to use a more complex
+configuration for it. The stdout and stderr logs of the two services are written into separate files
+in `/var/log/supervisor` directory.
+
+To build this image, simply drop the `--target` flag to build with this feature:
+
+```bash
+TILESERVER_GL_VERSION=v3.1.1
+docker build . \
+    --build-arg TILESERVER_GL_VERSION="${TILESERVER_GL_VERSION}" \
+    -t "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
+```
+
+And to run:
+
+```bash
+TILESERVER_GL_VERSION=v3.1.1
+docker run --rm -it -p 8080:8080 "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
+```
+
+Note again by default for this set-up, `openresty` always uses port 8080, and tileserver never
+exposes its port out of the container.
 
 ### Build details (for reading)
 
