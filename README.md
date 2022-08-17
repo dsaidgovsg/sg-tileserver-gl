@@ -40,7 +40,8 @@ Simply run
 If you wish to amend the min/max zoom details of the map, you can do the following:
 
 ```bash
-MIN_ZOOM=2 MAX_ZOOM=12 ./create-mbtiles.sh
+MIN_ZOOM=0 MAX_ZOOM=18 ./create-mbtiles.sh  # For max details
+MIN_ZOOM=2 MAX_ZOOM=12 ./create-mbtiles.sh  # For lower details
 ```
 
 You may set the `MAX_ZOOM` value to be very low for testing purposes.
@@ -88,7 +89,7 @@ Next run:
 
 ```bash
 # Check out <https://github.com/dsaidgovsg/sg-tileserver-gl/releases/tag/mbtiles> for the possible tags
-MBTILES_TAG=0-18_20210325T212157Z ./setup.sh
+MBTILES_TAG=0-18_20220815T202133Z ./setup.sh
 ```
 
 This will get all the files placed into `data/` (git ignored), ready for the final Docker build step
@@ -117,7 +118,7 @@ Then run the following to run the above image to run the build:
 docker run --rm -it \
     -v "${PWD}:/app" \
     -u "$(id -u):$(id -g)" \
-    -e "MBTILES_TAG=0-18_20210325T212157Z" \
+    -e "MBTILES_TAG=0-18_20220815T202133Z" \
     sg-tileserver-gl-builder:latest \
     ./setup.sh
 ```
