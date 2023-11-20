@@ -1,4 +1,4 @@
-ARG TILESERVER_GL_VERSION="v3.1.1"
+ARG TILESERVER_GL_VERSION="v4.6.6"
 FROM maptiler/tileserver-gl:${TILESERVER_GL_VERSION} AS native
 
 # This must be run after setup.sh
