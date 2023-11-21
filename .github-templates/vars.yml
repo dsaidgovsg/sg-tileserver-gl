@@ -1,5 +1,5 @@
 self_version: "v1.1.0"
 
 versions:
-- tileserver: ["v3.1.1"]
+- tileserver: ["v4.6.6"]
   mbtiles:    ["0-18_20210325T212157Z", "0-18_20220815T202133Z"]

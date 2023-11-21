@@ -15,9 +15,9 @@ jobs:
     strategy:
       matrix:
         version:
-        - tileserver: "v3.1.1"
+        - tileserver: "v4.6.6"
           mbtiles:    "0-18_20210325T212157Z"
-        - tileserver: "v3.1.1"
+        - tileserver: "v4.6.6"
           mbtiles:    "0-18_20220815T202133Z"
     runs-on: ubuntu-latest
     env:
