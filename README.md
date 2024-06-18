@@ -89,7 +89,7 @@ Next run:
 
 ```bash
 # Check out <https://github.com/dsaidgovsg/sg-tileserver-gl/releases/tag/mbtiles> for the possible tags
-MBTILES_TAG=0-18_20220815T202133Z ./setup.sh
+MBTILES_TAG=0-18_20240612T202043Z ./setup.sh
 ```
 
 This will get all the files placed into `data/` (git ignored), ready for the final Docker build step
@@ -118,7 +118,7 @@ Then run the following to run the above image to run the build:
 docker run --rm -it \
     -v "${PWD}:/app" \
     -u "$(id -u):$(id -g)" \
-    -e "MBTILES_TAG=0-18_20220815T202133Z" \
+    -e "MBTILES_TAG=0-18_20240612T202043Z" \
     sg-tileserver-gl-builder:latest \
     ./setup.sh
 ```
