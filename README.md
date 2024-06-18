@@ -133,7 +133,7 @@ Proceed to [next step](#Final-Docker-build-step) to finish up the Docker image.
 With the files in `data/`, run:
 
 ```bash
-TILESERVER_GL_VERSION=v4.6.6
+TILESERVER_GL_VERSION=v3.1.1
 docker build . \
     --build-arg TILESERVER_GL_VERSION="${TILESERVER_GL_VERSION}" \
     --target native \
@@ -143,7 +143,7 @@ docker build . \
 To run the image, run:
 
 ```bash
-TILESERVER_GL_VERSION=v4.6.6
+TILESERVER_GL_VERSION=v3.1.1
 docker run --rm -it -p 8080:80 "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
 ```
 
@@ -175,7 +175,7 @@ in `/var/log/supervisor` directory.
 To build this image, simply drop the `--target` flag to build with this feature:
 
 ```bash
-TILESERVER_GL_VERSION=v4.6.6
+TILESERVER_GL_VERSION=v3.1.1
 docker build . \
     --build-arg TILESERVER_GL_VERSION="${TILESERVER_GL_VERSION}" \
     -t "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
@@ -184,7 +184,7 @@ docker build . \
 And to run:
 
 ```bash
-TILESERVER_GL_VERSION=v4.6.6
+TILESERVER_GL_VERSION=v3.1.1
 docker run --rm -it -p 8080:8080 "sg-tileserver-gl:${TILESERVER_GL_VERSION}"
 ```
 
