@@ -84,4 +84,4 @@ jobs:
       run: bash push-images-ecr.sh
       env:
         ECR_REGISTRY: 802909931189.dkr.ecr.ap-southeast-1.amazonaws.com
-      if: github.event_name == 'push'
+      # if: github.event_name == 'push'
