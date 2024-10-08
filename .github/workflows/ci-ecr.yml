@@ -27,6 +27,9 @@ jobs:
       SELF_VERSION: "v1.1.0"
       TILESERVER_GL_VERSION: "${{ matrix.version.tileserver }}"
       MBTILES_TAG: "${{ matrix.version.mbtiles }}"
+    permissions:
+      id-token: write
+      contents: read
     steps:
     - name: Set TAG_NAME as env var export
       run: |-
