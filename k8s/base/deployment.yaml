@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sg-tileserver-deployment
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 2  # Will be patched in overlay
+  selector:
+    matchLabels:
+      app: map-service
+  template:
+    metadata:
+      labels:
+        app: map-service
+    spec:
+      nodeSelector:
+        node.kubernetes.io/worker-group: app
+      containers:
+      - name: map-service
+        image: map-image:master  # Will be patched in overlay
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
