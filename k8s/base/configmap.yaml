@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: lvis2-configs
+  name: map-configs
 data:
   LISTENING_ADDR: "8080"
   DNS_RESOLVER_ADDR: "169.254.1.1"
