@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sg-tileserver-deployment
+  name: map-deployment
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
