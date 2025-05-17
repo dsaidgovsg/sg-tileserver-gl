@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: template-nginx-conf
+data:
+  nginx.conf: |
+    events {}

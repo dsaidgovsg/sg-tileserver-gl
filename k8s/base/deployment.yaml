@@ -23,4 +23,12 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        volumeMounts:
+          - name: nginx-config-volume
+            mountPath: /etc/openresty/nginx.conf
+            subPath: nginx.conf
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: template-nginx-conf
 
