@@ -78,7 +78,11 @@ data:
         # https://stackoverflow.com/a/55917755
         header_filter_by_lua_block {
             -- Lua section
-            local allowed_origins = { ${ALLOWED_ORIGINS} }
+            local allowed_origins = {
+                ["http://localhost:8090"] = true,
+                ["https://vis2.locus-stg.gov.sg"] = true,
+
+            }
 
             local origin = ngx.req.get_headers()["Origin"]
             local has_origin_match = ngx.status == 200 and allowed_origins[origin]
