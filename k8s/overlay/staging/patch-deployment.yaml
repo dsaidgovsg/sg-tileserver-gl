@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: map-deployment
+  name: maps-deployment
 spec:
   replicas: 1
   template:
     spec:
       containers:
-      - name: map-service
+      - name: maps-service
         image: 528757826541.dkr.ecr.ap-southeast-1.amazonaws.com/dsaidgovsg/sg-tileserver-gl:v1.1.0_tileserver-v3.1.1_mbtiles-0-18_20240612T202043Z_openresty
         resources:
           requests:

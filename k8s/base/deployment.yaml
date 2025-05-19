@@ -2,24 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: map-deployment
+  name: maps-deployment
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
   replicas: 2  # Will be patched in overlay
   selector:
     matchLabels:
-      app: map-service
+      app: maps-service
   template:
     metadata:
       labels:
-        app: map-service
+        app: maps-service
     spec:
       nodeSelector:
         node.kubernetes.io/worker-group: app
       containers:
-      - name: map-service
-        image: map-image:master  # Will be patched in overlay
+      - name: maps-service
+        image: maps-image:master  # Will be patched in overlay
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -30,5 +30,4 @@ spec:
       volumes:
         - name: nginx-config-volume
           configMap:
-            name: template-nginx-conf
-
+            name: maps-nginx-conf
