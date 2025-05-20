@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maps-nginx-conf
+data: # Will be patched in overlay
+  nginx.conf: |
+    events {} 

@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maps-nginx-conf
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+        access_log /dev/stdout;
+        error_log /dev/stderr warn;
+
+        server {
+            listen 8080;
+            server_tokens off;
+            add_header X-Frame-Options DENY always;
+
+            # This forces the DNS resolver to resolve and cache the URL properly:
+            # https://www.nginx.com/blog/dns-service-discovery-nginx-plus/#domain-name-upstream-group
+            # See: "Setting the Domain Name in a Variable"
+            resolver 169.254.1.1 valid=60s;
+
+            proxy_http_version 1.1;
+
+            gzip on;
+            gzip_disable "msie6";
+            gzip_vary on;
+            gzip_proxied any;
+            gzip_comp_level 9;
+            gzip_buffers 16 8k;
+            gzip_http_version 1.1;
+            gzip_min_length 128;
+            gzip_types
+                text/plain
+                text/css
+                text/javascript
+                text/xml
+                application/json
+                application/javascript
+                application/x-javascript
+                application/yaml
+                application/x-yaml
+                application/xml
+                application/xml+rss
+                application/vnd.ms-fontobject
+                application/x-font-ttf
+                font/opentype
+                font/woff
+                image/svg+xml
+                image/x-icon;
+
+            # Both Host and X-Forwarded-Proxy header values will affect the returned URLs in JSON
+            # So we need to manipulate these values accordingly
+            location / {
+                proxy_pass http://127.0.0.1:8081/;
+                proxy_set_header Host $http_host;
+            }
+
+            location /_/maps/ {
+                proxy_pass http://127.0.0.1:8081/;
+
+                # Original X-Forwarded-Proxy comes from traefik, and is set to https
+                # Hence the returned URL uses https
+                # Here we do not change the Host because we cannot get the additional /_/maps path that way
+                sub_filter https://127.0.0.1:8081 https://$http_host/_/maps;
+                sub_filter_once off;
+                sub_filter_types application/json;
+            }
+
+            location /health {
+                add_header Content-Type text/plain;
+                add_header X-Frame-Options DENY always;
+                return 200 "OK";
+            }
+        }
+
+        # Lua solution:
+        # https://stackoverflow.com/a/55917755
+        header_filter_by_lua_block {
+            -- Lua section
+            local allowed_origins = {
+                ["http://localhost:8090"] = true,
+                ["https://vis2.locus-stg.gov.sg"] = true,
+
+            }
+
+            local origin = ngx.req.get_headers()["Origin"]
+            local has_origin_match = ngx.status == 200 and allowed_origins[origin]
+
+            ngx.header["Access-Control-Allow-Origin"] = has_origin_match and origin or nil
+            ngx.header["Access-Control-Allow-Methods"] = has_origin_match and "GET,OPTIONS" or nil
+            ngx.header["Access-Control-Allow-Credentials"] = "true"
+        }
+    }

@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maps-deployment
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 2  # Will be patched in overlay
+  selector:
+    matchLabels:
+      app: maps-service
+  template:
+    metadata:
+      labels:
+        app: maps-service
+    spec:
+      nodeSelector:
+        node.kubernetes.io/worker-group: app
+      containers:
+      - name: maps-service
+        image: maps-image:master  # Will be patched in overlay
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: nginx-config-volume
+            mountPath: /etc/openresty/nginx.conf
+            subPath: nginx.conf
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: maps-nginx-conf
