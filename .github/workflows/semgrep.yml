@@ -48,18 +48,6 @@ jobs:
           # and add it to your GitHub secrets.
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
-      - name: Count Semgrep results
-        id: count
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const report = JSON.parse(fs.readFileSync('semgrep.sarif','utf8'));
-            const total = report.runs
-              .reduce((sum, run) => sum + (run.results?.length||0), 0);
-            core.setOutput('total', total);
-
       - name: Manage Semgrep Issue
         uses: actions/github-script@v6
         with:
