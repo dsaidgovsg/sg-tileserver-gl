@@ -49,7 +49,8 @@ jobs:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Manage Semgrep Issue
-        uses: actions/github-script@v6
+        id: semgrep-results
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -277,3 +278,13 @@ jobs:
                 }
               }
             }
+            
+            core.setOutput('findings-count', total);
+            return total;
+      - name: Block CI on Security Issues
+        if: steps.semgrep-results.outputs.findings-count > 0
+        run: |
+          echo "❌ BLOCKING: Semgrep found ${{ steps.semgrep-results.outputs.findings-count }} security issue(s)"
+          echo "Please resolve all security findings before merging."
+          echo "Check the GitHub issue created for detailed information."
+          exit 1
