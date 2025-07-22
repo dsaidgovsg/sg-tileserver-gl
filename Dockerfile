@@ -9,6 +9,11 @@ FROM native AS openresty
 
 USER root
 
+# Fix Buster repository URLs
+RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list && \
+    sed -i '/buster-updates/d' /etc/apt/sources.list
+
 # This section assume the distro underlying tileserver-gl is Debian (buster at the moment)
 # Verify debian as the distro first
 RUN . /etc/os-release && test $ID = "debian"
