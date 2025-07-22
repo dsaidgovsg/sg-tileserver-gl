@@ -1,0 +1,279 @@
+# Name of this GitHub Actions workflow.
+name: Semgrep
+
+on:
+  # Scan changed files in PRs (diff-aware scanning):
+  pull_request: {}
+  # Scan on-demand through GitHub Actions interface:
+  workflow_dispatch: {}
+  # Scan mainline branches if there are changes to .github/workflows/semgrep.yml:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - .github/workflows/semgrep.yml
+  # Schedule the CI job (this method uses cron syntax):
+  schedule:
+    - cron: '30 6 1 * *' # Sets Semgrep to scan once every month
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  semgrep:
+    # User definable name of this GitHub Actions job.
+    name: semgrep/ci
+    # If you are self-hosting, change the following `runs-on` value:
+    runs-on: ubuntu-latest
+
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: semgrep/semgrep
+
+    # Skip any PR created by dependabot to avoid permission issues:
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+      # Fetch project source with GitHub Actions Checkout. Use either v3 or v4.
+      - uses: actions/checkout@v4
+      # Run the "semgrep ci" command on the command line of the docker image.
+      - run: semgrep ci --dry-run --sarif > semgrep.sarif
+        env:
+          # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
+          # Generate a token from Semgrep AppSec Platform > Settings
+          # and add it to your GitHub secrets.
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Manage Semgrep Issue
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+
+            // 1. Load & parse SARIF
+            const sarif = JSON.parse(
+              fs.readFileSync('semgrep.sarif', 'utf8')
+            );
+
+            // 2. Build ruleId → metadata map
+            const rulesMap = {};
+            for (const run of sarif.runs || []) {
+              for (const r of run.tool.driver.rules || []) {
+                rulesMap[r.id] = r;
+              }
+            }
+
+            // 3. Flatten findings
+            const findings = [];
+            for (const run of sarif.runs || []) {
+              for (const res of run.results || []) {
+                const meta = rulesMap[res.ruleId] || {};
+                const severity =
+                  res.level ||
+                  meta.defaultConfiguration?.level ||
+                  'warning';
+
+                const loc = res.locations?.[0]?.physicalLocation;
+                const file = loc?.artifactLocation?.uri || '';
+                const rg = loc?.region || {};
+                const location = rg.startLine
+                  ? `${rg.startLine}:` +
+                    `${rg.startColumn}-` +
+                    `${rg.endLine}:` +
+                    `${rg.endColumn}`
+                  : '';
+
+                const message = res.message.text.replace(
+                  /\r?\n/g,
+                  ' '
+                );
+                const helpUri = meta.helpUri || '';
+
+                findings.push({
+                  file,
+                  location,
+                  ruleId: res.ruleId,
+                  message,
+                  severity,
+                  helpUri,
+                });
+              }
+            }
+
+            const total = findings.length;
+            const branch =
+              process.env.GITHUB_HEAD_REF ||
+              process.env.GITHUB_REF_NAME;
+            const baseTitle = `[Semgrep:${branch}]`;
+            const label = 'semgrep';
+
+            // 4. Helpers to find existing issues
+            async function searchIssues(state) {
+              const q = [
+                `repo:${owner}/${repo}`,
+                'is:issue',
+                `label:${label}`,
+                `in:title "${baseTitle}"`,
+                `state:${state}`,
+              ].join(' ');
+              const res =
+                await github.rest.search.issuesAndPullRequests({ q });
+              return res.data.items;
+            }
+
+            const openIssues = await searchIssues('open');
+            const closedIssues = await searchIssues('closed');
+
+            // 5. Build Markdown table if needed
+            let tableHeader, tableRows, body, title;
+            if (total > 0) {
+              tableHeader = [
+                '| File | Location | Rule ID | Message | Severity | More Info |',
+                '| ---- | -------- | ------- | ------- | -------- | --------- |',
+              ].join('\n');
+              tableRows = findings
+                .map((f) => {
+                  const more = f.helpUri
+                    ? `[link](${f.helpUri})`
+                    : '';
+                  return `| ${[
+                    f.file,
+                    f.location,
+                    `\`${f.ruleId}\``,
+                    f.message,
+                    f.severity,
+                    more,
+                  ].join(' | ')} |`;
+                })
+                .join('\n');
+
+              title = `${baseTitle} ${total} issue${
+                total !== 1 ? 's' : ''
+              } found`;
+              body = `
+              Semgrep detected **${total}** issue${
+                              total !== 1 ? 's' : ''
+                            } on branch **${branch}**.
+
+              ${tableHeader}
+              ${tableRows}
+              `.trim();
+            } else {
+              // zero findings
+              title = `${baseTitle} 0 issues found`;
+              body = `Semgrep detected **no** issues on branch **${branch}**. All clear!`;
+            }
+
+            // 6. Create / update / reopen / close
+            if (total > 0) {
+              let issueItem;
+              if (openIssues.length) {
+                issueItem = openIssues[0];
+                // update body/title
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: issueItem.number,
+                  title,
+                  body,
+                });
+              } else if (closedIssues.length) {
+                issueItem = closedIssues[0];
+                // reopen + update
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: issueItem.number,
+                  state: 'open',
+                  title,
+                  body,
+                });
+              } else {
+                // create new
+                const newIssue =
+                  await github.rest.issues.create({
+                    owner,
+                    repo,
+                    title,
+                    body,
+                    labels: [label],
+                  });
+                issueItem = newIssue.data;
+              }
+              // 7. If running on a PR, delete existing comments and link back
+              if (context.payload.pull_request) {
+                // Get all comments on the PR
+                const comments = await github.rest.issues.listComments({
+                  owner,
+                  repo,
+                  issue_number: context.payload.pull_request.number,
+                });
+                
+                // Delete any comments that appear to be from Semgrep
+                for (const comment of comments.data) {
+                  if (comment.body.includes('Semgrep findings') || 
+                      comment.body.includes('Semgrep detected')) {
+                    await github.rest.issues.deleteComment({
+                      owner,
+                      repo,
+                      comment_id: comment.id
+                    });
+                  }
+                }
+                
+                // Create new comment
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: context.payload.pull_request.number,
+                  body: `🔗 Semgrep detected ${total} issue${total !== 1 ? 's' : ''}. See details in issue #${issueItem.number}`,
+                });
+              }
+            } else {
+              // total === 0 → close any open
+              if (openIssues.length) {
+                const toClose = openIssues[0];
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: toClose.number,
+                  state: 'closed',
+                  title,
+                  body,
+                });
+                if (context.payload.pull_request) {
+                  // Get all comments on the PR
+                  const comments = await github.rest.issues.listComments({
+                    owner,
+                    repo,
+                    issue_number: context.payload.pull_request.number,
+                  });
+                  
+                  // Delete any comments that appear to be from Semgrep
+                  for (const comment of comments.data) {
+                    if (comment.body.includes('Semgrep findings') || 
+                        comment.body.includes('Semgrep detected')) {
+                      await github.rest.issues.deleteComment({
+                        owner,
+                        repo,
+                        comment_id: comment.id
+                      });
+                    }
+                  }
+                  
+                  // Create new comment
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: context.payload.pull_request.number,
+                    body: `✅ No Semgrep findings, closing issue #${toClose.number}`,
+                  });
+                }
+              }
+            }
