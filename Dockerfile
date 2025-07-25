@@ -31,7 +31,7 @@ RUN apt-get update && \
     :
 
 RUN addgroup svisor && \
-    adduser --no-create-home --disabled-password --gecos "" svisor --ingroup svisor && \
+    adduser -u 1001 --no-create-home --disabled-password --gecos "" svisor --ingroup svisor && \
     :
 
 RUN mkdir -p /var/run/supervisor /var/log/supervisor/ && \
@@ -43,6 +43,6 @@ RUN mkdir -p /var/run/supervisor /var/log/supervisor/ && \
 COPY supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY supervisord/nginx.conf /etc/openresty/nginx.conf
 
-USER svisor
+USER 1001
 
 CMD ["/usr/bin/supervisord"]
