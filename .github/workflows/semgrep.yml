@@ -1,9 +1,9 @@
-# Name of this GitHub Actions workflow.
 name: Semgrep
 
 on:
   # Scan changed files in PRs (diff-aware scanning):
-  pull_request: {}
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
   # Scan on-demand through GitHub Actions interface:
   workflow_dispatch: {}
   # Scan mainline branches if there are changes to .github/workflows/semgrep.yml:
@@ -49,7 +49,8 @@ jobs:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Manage Semgrep Issue
-        uses: actions/github-script@v6
+        id: semgrep-results
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -69,10 +70,16 @@ jobs:
               }
             }
 
-            // 3. Flatten findings
+            // 3. Flatten findings (separate suppressed and unsuppressed)
             const findings = [];
+            const suppressedFindings = [];
             for (const run of sarif.runs || []) {
               for (const res of run.results || []) {
+                // Skip if the issue has suppressions
+                if (res.suppressions && res.suppressions.length > 0) {
+                  continue;
+                }
+
                 const meta = rulesMap[res.ruleId] || {};
                 const severity =
                   res.level ||
@@ -95,14 +102,22 @@ jobs:
                 );
                 const helpUri = meta.helpUri || '';
 
-                findings.push({
+                const finding = {
                   file,
                   location,
                   ruleId: res.ruleId,
                   message,
                   severity,
                   helpUri,
-                });
+                };
+
+                // Separate suppressed from unsuppressed issues
+                if (res.suppressions && res.suppressions.length > 0) {
+                  finding.suppressionReason = res.suppressions[0].kind || 'suppressed';
+                  suppressedFindings.push(finding);
+                } else {
+                  findings.push(finding);
+                }
               }
             }
 
@@ -131,13 +146,12 @@ jobs:
             const closedIssues = await searchIssues('closed');
 
             // 5. Build Markdown table if needed
-            let tableHeader, tableRows, body, title;
-            if (total > 0) {
-              tableHeader = [
-                '| File | Location | Rule ID | Message | Severity | More Info |',
-                '| ---- | -------- | ------- | ------- | -------- | --------- |',
-              ].join('\n');
-              tableRows = findings
+            let tableHeader, tableRows, suppressedTableRows, body, title;
+            const totalSuppressed = suppressedFindings.length;
+            
+            // Helper function to build table rows
+            function buildTableRows(findingsList) {
+              return findingsList
                 .map((f) => {
                   const more = f.helpUri
                     ? `[link](${f.helpUri})`
@@ -152,26 +166,37 @@ jobs:
                   ].join(' | ')} |`;
                 })
                 .join('\n');
+            }
+            
+            if (total > 0 || totalSuppressed > 0) {
+              tableHeader = [
+                '| File | Location | Rule ID | Message | Severity | More Info |',
+                '| ---- | -------- | ------- | ------- | -------- | --------- |',
+              ].join('\n');
+              
+              let bodyParts = [];
+              
+              if (total > 0) {
+                tableRows = buildTableRows(findings);
+                bodyParts.push(`## 🚨 Active Issues (${total})\n\n${tableHeader}\n${tableRows}`);
+              }
+              
+              if (totalSuppressed > 0) {
+                suppressedTableRows = buildTableRows(suppressedFindings);
+                bodyParts.push(`## 🔇 Suppressed Issues (${totalSuppressed})\n\n${tableHeader}\n${suppressedTableRows}`);
+              }
 
-              title = `${baseTitle} ${total} issue${
-                total !== 1 ? 's' : ''
-              } found`;
-              body = `
-              Semgrep detected **${total}** issue${
-                              total !== 1 ? 's' : ''
-                            } on branch **${branch}**.
-
-              ${tableHeader}
-              ${tableRows}
-              `.trim();
+              title = `${baseTitle} ${total} issue${total !== 1 ? 's' : ''} found${totalSuppressed > 0 ? ` (${totalSuppressed} suppressed)` : ''}`;
+              
+              body = `Semgrep detected **${total}** active issue${total !== 1 ? 's' : ''} on branch **${branch}**${totalSuppressed > 0 ? ` and **${totalSuppressed}** suppressed issue${totalSuppressed !== 1 ? 's' : ''}` : ''}.\n\n${bodyParts.join('\n\n')}`;
             } else {
-              // zero findings
+              // zero findings (both active and suppressed)
               title = `${baseTitle} 0 issues found`;
               body = `Semgrep detected **no** issues on branch **${branch}**. All clear!`;
             }
 
             // 6. Create / update / reopen / close
-            if (total > 0) {
+            if (total > 0 || totalSuppressed > 0 || openIssues.length || closedIssues.length) {
               let issueItem;
               if (openIssues.length) {
                 issueItem = openIssues[0];
@@ -185,15 +210,26 @@ jobs:
                 });
               } else if (closedIssues.length) {
                 issueItem = closedIssues[0];
-                // reopen + update
-                await github.rest.issues.update({
-                  owner,
-                  repo,
-                  issue_number: issueItem.number,
-                  state: 'open',
-                  title,
-                  body,
-                });
+                // Only reopen if there are active issues, otherwise just update the closed issue
+                if (total > 0) {
+                  await github.rest.issues.update({
+                    owner,
+                    repo,
+                    issue_number: issueItem.number,
+                    state: 'open',
+                    title,
+                    body,
+                  });
+                } else {
+                  // Just update the content without reopening
+                  await github.rest.issues.update({
+                    owner,
+                    repo,
+                    issue_number: issueItem.number,
+                    title,
+                    body,
+                  });
+                }
               } else {
                 // create new
                 const newIssue =
@@ -206,6 +242,16 @@ jobs:
                   });
                 issueItem = newIssue.data;
               }
+              
+              // If there are no active issues, close the issue immediately after creating/updating it
+              if (total === 0) {
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: issueItem.number,
+                  state: 'closed',
+                });
+              }
               // 7. If running on a PR, delete existing comments and link back
               if (context.payload.pull_request) {
                 // Get all comments on the PR
@@ -215,10 +261,9 @@ jobs:
                   issue_number: context.payload.pull_request.number,
                 });
                 
-                // Delete any comments that appear to be from Semgrep
+                // Delete any comments that contain our unique marker
                 for (const comment of comments.data) {
-                  if (comment.body.includes('Semgrep findings') || 
-                      comment.body.includes('Semgrep detected')) {
+                  if (comment.body.includes('<!-- semgrep-workflow-comment -->')) {
                     await github.rest.issues.deleteComment({
                       owner,
                       repo,
@@ -228,52 +273,36 @@ jobs:
                 }
                 
                 // Create new comment
+                let commentBody;
+                const marker = '<!-- semgrep-workflow-comment -->';
+                if (total > 0) {
+                  // There are active issues - issue remains open
+                  commentBody = totalSuppressed > 0 
+                    ? `${marker}\n🔗 Semgrep detected ${total} issue${total !== 1 ? 's' : ''} (${totalSuppressed} suppressed). See details in issue #${issueItem.number}`
+                    : `${marker}\n🔗 Semgrep detected ${total} issue${total !== 1 ? 's' : ''}. See details in issue #${issueItem.number}`;
+                } else if (totalSuppressed > 0) {
+                  // Only suppressed issues - issue is closed since no active issues
+                  commentBody = `${marker}\n🔇 Semgrep found ${totalSuppressed} suppressed issue${totalSuppressed !== 1 ? 's' : ''}, closing issue #${issueItem.number} (no active issues)`;
+                } else {
+                  // No issues at all - issue is closed
+                  commentBody = `${marker}\n✅ No Semgrep findings, closing issue #${issueItem.number}`;
+                }
+                
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: context.payload.pull_request.number,
-                  body: `🔗 Semgrep detected ${total} issue${total !== 1 ? 's' : ''}. See details in issue #${issueItem.number}`,
+                  body: commentBody,
                 });
-              }
-            } else {
-              // total === 0 → close any open
-              if (openIssues.length) {
-                const toClose = openIssues[0];
-                await github.rest.issues.update({
-                  owner,
-                  repo,
-                  issue_number: toClose.number,
-                  state: 'closed',
-                  title,
-                  body,
-                });
-                if (context.payload.pull_request) {
-                  // Get all comments on the PR
-                  const comments = await github.rest.issues.listComments({
-                    owner,
-                    repo,
-                    issue_number: context.payload.pull_request.number,
-                  });
-                  
-                  // Delete any comments that appear to be from Semgrep
-                  for (const comment of comments.data) {
-                    if (comment.body.includes('Semgrep findings') || 
-                        comment.body.includes('Semgrep detected')) {
-                      await github.rest.issues.deleteComment({
-                        owner,
-                        repo,
-                        comment_id: comment.id
-                      });
-                    }
-                  }
-                  
-                  // Create new comment
-                  await github.rest.issues.createComment({
-                    owner,
-                    repo,
-                    issue_number: context.payload.pull_request.number,
-                    body: `✅ No Semgrep findings, closing issue #${toClose.number}`,
-                  });
-                }
               }
             }
+            
+            core.setOutput('findings-count', total);
+            return total;
+      - name: Block CI on Security Issues
+        if: steps.semgrep-results.outputs.findings-count > 0
+        run: |
+          echo "❌ BLOCKING: Semgrep found ${{ steps.semgrep-results.outputs.findings-count }} security issue(s)"
+          echo "Please resolve all security findings before merging."
+          echo "Check the GitHub issue created for detailed information."
+          exit 1
