@@ -18,3 +18,5 @@ echo "Generating styles..."
 "${ROOT_DIR}/setup-scripts/generate-styles.sh"
 
 echo "Completed!"
+
+echo "Hello!"
